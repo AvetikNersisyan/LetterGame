@@ -81,6 +81,21 @@
     pointer-events: none;
 }
 
+.over-popup {
+    display: block;
+    height: 50vh;
+    width: 50vw;
+    background-color: #dc2828;
+    position: absolute;
+    top: 10vh;
+    left: 20vw;
+    z-index: 100;
+}
+
+.over-popup-invisible{
+    display: none;
+}
+
 #pointInfo {
     font-size:large;
     padding: 1em;
@@ -108,3 +123,4 @@
     border-radius: 8px;
     background-color: rgba(162, 159, 159, 0.49);
 }
+

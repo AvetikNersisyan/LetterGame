@@ -156,10 +156,11 @@ class Render {
 
 class App {
     sidebar = new SideBar();
-
     timer = new Timer(16);
+    popup = new Popup()
 
     render() {
+
         this.question = new Question();
         this.question.render();
         this.answer = new Answer(false, this.question.randomChar, this.question.number, this.question.operand, this.question.letters);
@@ -171,11 +172,18 @@ class App {
         this.isAnswerTrue();
         this.timer.start()
 
+        // not ready yet...
+        if (this.sidebar.gameDetails.questionsCount >=10){
+        // this.popup.gameOver()
+
+        }
+
 
     }
 
     isAnswerTrue() {
         document.querySelector(".AnswerBox").addEventListener("click", (event) => {
+            this.isThereAnswer = true;
             if (!this.timer.isTimeLeft){
                 return;
 
@@ -216,10 +224,17 @@ class App {
     nextQuestion() {
         document.querySelector("button").addEventListener("click", (ev) => {
 
+
             Render.reset(".root");
             this.render();
             this.timer.pause();
             this.timer.start()
+
+            if (!this.isThereAnswer){
+                this.sidebar.gameDetails.questionsCount++;
+                this.sidebar.showPoints()
+            }
+            this.isThereAnswer = false;
         });
     }
 }
@@ -285,6 +300,18 @@ class Timer {
         }
     }
 
+}
+
+
+// some functionalities to add ???
+class Popup {
+
+    gameOver(){
+      const overPopupElement =  new Render("div",".mainContainer").display();
+      overPopupElement.className = "over-popup";
+
+      return overPopupElement;
+    }
 }
 
 
