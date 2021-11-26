@@ -104,7 +104,6 @@ class Answer {
     render(tagName, selector) {
         const answerElement = new Render(tagName, selector).display();
 
-
         answerElement.setAttribute("class", "AnswerBox");
         const arrOfElements = [`<div id="answer1"> ${this.wrongChars[1]}</div>`,
             `<div id="answer2"> ${this.wrongChars[2]}</div>`,
@@ -114,7 +113,7 @@ class Answer {
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
 
-            while (currentIndex !== 0) {
+            while (currentIndex) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
                 currentIndex--;
 
@@ -125,7 +124,7 @@ class Answer {
             return array;
         }
 
-        shuffle(arrOfElements)
+        shuffle(arrOfElements);
 
         answerElement.innerHTML = `${arrOfElements[0]} 
                                    ${arrOfElements[1]} 
@@ -143,6 +142,11 @@ class Render {
         this.selector = selector;
     }
 
+    static reset(selector) {
+        const element = document.querySelector(selector);
+        element.innerHTML = "";
+    }
+
     display() {
         const rootElement = document.querySelector(this.selector);
         const createdElement = document.createElement(this.tagName);
@@ -155,24 +159,56 @@ class Render {
 
 class App {
 
+     static render() {
+        this.question = new Question();
+        this.question.render();
+        this.answer = new Answer(false, this.question.randomChar, this.question.number, this.question.operand, this.question.letters);
+        this.answer.rightAnswer();
+        this.answer.wrongAnswer();
+        this.answer.render("div", ".root");
+        this.sidebar = new SideBar();
+        this.sidebar.pointCounter();
+        this.sidebar.render();
 
-    static render() {
-        const question = new Question();
-        question.render();
-        const answer = new Answer(false, question.randomChar, question.number, question.operand, question.letters);
-        answer.rightAnswer();
-        answer.wrongAnswer();
-        answer.render("div", ".root");
-        // answer.render("div", ".wrongAnswerBox", true);
 
 
     }
 
+    //// does not work.
+    static addPoint() {
+        document.querySelector(".testBtn").addEventListener.bind(this,"click", (ev)=> {
+            this.sidebar.pointCounter();
+            this.sidebar.render();
+        })
+    }
+
+
 
 }
 
+class SideBar {
+   points = 0;
+     pointCounter () {
+            return ++(this.points);
+    }
+
+    render(){
+       let countElement = new Render("button", ".root").display();
+       countElement.innerHTML = this.points;
+    }
+}
+
+
+document.querySelector("button").addEventListener("click", (ev) => {
+
+
+    Render.reset(".root");
+    App.render();
+});
 
 App.render();
+App.addPoint()
+
 
 
 
