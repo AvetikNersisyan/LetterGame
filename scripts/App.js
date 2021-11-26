@@ -27,11 +27,11 @@ class Question {
         if (this.operand === " + ") {
             this.max = this.letters.length - this.letters.indexOf(this.randomChar);
             this.number = this.randomNum(0, this.max);
-            this.questionText += this.randomChar + this.operand + this.number;
+            this.questionText += "\"" + this.randomChar + "\" " + this.operand + this.number;
         } else {
             this.max = this.letters.indexOf(this.randomChar);
             this.number = this.randomNum(0, this.max + 1);
-            this.questionText += this.randomChar + this.operand + this.number;
+            this.questionText += "\"" + this.randomChar + "\" " + this.operand + this.number;
         }
 
 
@@ -46,8 +46,7 @@ class Question {
 
 
     questionDetails() {
-        let question = this.askQuestion();
-        return question;
+        return this.askQuestion();
     }
 
 
@@ -105,10 +104,10 @@ class Answer {
         const answerElement = new Render(tagName, selector).display();
 
         answerElement.setAttribute("class", "AnswerBox");
-        const arrOfElements = [`<div id="answer1"> ${this.wrongChars[1]}</div>`,
-            `<div id="answer2"> ${this.wrongChars[2]}</div>`,
-            `<div id="answer0"> ${this.wrongChars[0]}</div>`,
-            `<div id="answer3"> ${this.wrongChars[3]}</div>`];
+        const arrOfElements = [`<div id="answer1" class="options"> ${this.wrongChars[1]}</div>`,
+            `<div id="answer2" class="options"> ${this.wrongChars[2]}</div>`,
+            `<div id="answer0" class="options"> ${this.wrongChars[0]}</div>`,
+            `<div id="answer3" class="options"> ${this.wrongChars[3]}</div>`];
 
         function shuffle(array) {
             let currentIndex = array.length, randomIndex;
@@ -132,8 +131,6 @@ class Answer {
                                    ${arrOfElements[3]}`;
 
     }
-
-
 }
 
 class Render {
@@ -150,7 +147,7 @@ class Render {
     display() {
         const rootElement = document.querySelector(this.selector);
         const createdElement = document.createElement(this.tagName);
-        rootElement.append(createdElement);
+        rootElement.appendChild(createdElement);
         return createdElement;
 
     }
@@ -158,56 +155,140 @@ class Render {
 
 
 class App {
+    sidebar = new SideBar();
 
-     static render() {
+    timer = new Timer(15);
+
+    render() {
         this.question = new Question();
         this.question.render();
         this.answer = new Answer(false, this.question.randomChar, this.question.number, this.question.operand, this.question.letters);
         this.answer.rightAnswer();
         this.answer.wrongAnswer();
         this.answer.render("div", ".root");
-        this.sidebar = new SideBar();
-        this.sidebar.pointCounter();
         this.sidebar.render();
-
+        this.sidebar.showPoints();
+        this.isAnswerTrue();
+        this.timer.start()
 
 
     }
 
-    //// does not work.
-    static addPoint() {
-        document.querySelector(".testBtn").addEventListener.bind(this,"click", (ev)=> {
-            this.sidebar.pointCounter();
-            this.sidebar.render();
-        })
+    isAnswerTrue() {
+        document.querySelector(".AnswerBox").addEventListener("click", (event) => {
+            const answerBoxElement = event.target.parentElement;
+
+            this.sidebar.gameDetails.questionsCount++;
+            this.sidebar.showPoints();
+            this.timer.pause()
+
+            if (event.target.id === "answer0") {
+                event.target.className = "right-answer";
+                this.sidebar.pointCounter();
+                this.sidebar.showPoints();
+
+
+
+            } else {
+                if (event.target.className !== "AnswerBox") {
+                    event.target.className = "wrong-answer";
+
+                }
+
+            }
+            if (answerBoxElement.className !== "root") {
+                answerBoxElement.classList.toggle("AnswerBox-invisible");
+            }
+
+        });
     }
 
 
+    nextQuestion() {
+        document.querySelector("button").addEventListener("click", (ev) => {
 
+            Render.reset(".root");
+            this.render();
+            this.timer.pause();
+            this.timer.start()
+        });
+    }
 }
+
 
 class SideBar {
-   points = 0;
-     pointCounter () {
-            return ++(this.points);
+
+    gameDetails = {
+        points: 0,
+        questionsCount: 0
+    };
+
+
+    pointCounter() {
+        return ++(this.gameDetails.points);
     }
 
-    render(){
-       let countElement = new Render("button", ".root").display();
-       countElement.innerHTML = this.points;
+    render() {
+        let countElement = new Render("div", ".root").display();
+        countElement.setAttribute("id", "pointInfo");
+        countElement.innerHTML = this.gameDetails.points;
+    }
+
+    showPoints() {
+        const pointBoxElement = document.getElementById("pointInfo");
+        pointBoxElement.innerHTML = `Your have ${this.gameDetails.points} points out of ${this.gameDetails.questionsCount} questions`;
+    }
+
+
+}
+
+
+class Timer {
+    constructor(maxTime = 15) {
+        this.initialVal = maxTime;
+        this.isRunning = false;
+        this.currTimer = maxTime;
+        this.runTimer;
+        this.timer = document.getElementById('testBtn');
+    }
+
+    start() {
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.currTimer = this.initialVal
+            this.runTimer = setInterval(() => {
+                if (this.currTimer<=0){
+                    return
+                }
+                this.timer.innerHTML = --this.currTimer +"";
+            }, 1000);
+        }
+    }
+
+    pause() {
+        if (this.isRunning) {
+            clearInterval(this.runTimer);
+            this.isRunning = false;
+        }
     }
 }
 
 
-document.querySelector("button").addEventListener("click", (ev) => {
+class Run {
+
+    static letterGame() {
+        const app = new App();
+        app.render();
+        app.nextQuestion();
+    }
+}
+
+Run.letterGame();
 
 
-    Render.reset(".root");
-    App.render();
-});
 
-App.render();
-App.addPoint()
+
+
 
 
 
