@@ -150,9 +150,7 @@ class App {
         // answer.render("div", ".wrongAnswerBox", true);
 
 
-        console.log(question);
-        console.log(answer.rightChar);
-        console.log(answer.wrongAnswer());
+
     }
 
 
