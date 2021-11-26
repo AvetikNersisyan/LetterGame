@@ -85,3 +85,26 @@
     font-size:large;
     padding: 1em;
 }
+
+#nextQuestionBtn {
+    margin-left: 50vw;
+    width: 30vw;
+    font-size: 0.5em;
+    padding: 0.3em;
+    border-radius: 5px;
+}
+
+#nextQuestionBtn:hover {
+    background-color: burlywood;
+    color: black;
+    cursor: pointer;
+}
+
+#timer {
+    border: solid black 2px;
+    height: 1.3em;
+    width: 6em;
+    padding: 0.3em;
+    border-radius: 8px;
+    background-color: rgba(162, 159, 159, 0.49);
+}

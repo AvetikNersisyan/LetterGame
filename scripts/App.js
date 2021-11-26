@@ -157,7 +157,7 @@ class Render {
 class App {
     sidebar = new SideBar();
 
-    timer = new Timer(15);
+    timer = new Timer(16);
 
     render() {
         this.question = new Question();
@@ -176,11 +176,18 @@ class App {
 
     isAnswerTrue() {
         document.querySelector(".AnswerBox").addEventListener("click", (event) => {
+            if (!this.timer.isTimeLeft){
+                return;
+
+            }
+
             const answerBoxElement = event.target.parentElement;
 
             this.sidebar.gameDetails.questionsCount++;
             this.sidebar.showPoints();
             this.timer.pause()
+
+
 
             if (event.target.id === "answer0") {
                 event.target.className = "right-answer";
@@ -196,7 +203,9 @@ class App {
                 }
 
             }
-            if (answerBoxElement.className !== "root") {
+
+            console.log(this.timer.isTimeLeft);
+            if (answerBoxElement.className !== "root"  ) {
                 answerBoxElement.classList.toggle("AnswerBox-invisible");
             }
 
@@ -245,22 +254,26 @@ class SideBar {
 
 class Timer {
     constructor(maxTime = 15) {
+        this.isTimeLeft = true;
         this.initialVal = maxTime;
         this.isRunning = false;
         this.currTimer = maxTime;
         this.runTimer;
-        this.timer = document.getElementById('testBtn');
+        this.timer = document.getElementById('timer');
     }
 
     start() {
         if (!this.isRunning) {
+            this.isTimeLeft = true;
             this.isRunning = true;
             this.currTimer = this.initialVal
             this.runTimer = setInterval(() => {
                 if (this.currTimer<=0){
+                    this.isTimeLeft = false;
                     return
                 }
-                this.timer.innerHTML = --this.currTimer +"";
+                this.timer.innerHTML = this.currTimer<11? "Timer 00:0" + --this.currTimer: "Timer 00:" + --this.currTimer;
+
             }, 1000);
         }
     }
@@ -271,6 +284,7 @@ class Timer {
             this.isRunning = false;
         }
     }
+
 }
 
 
