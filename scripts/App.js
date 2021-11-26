@@ -111,10 +111,26 @@ class Answer {
             `<div id="answer0"> ${this.wrongChars[0]}</div>`,
             `<div id="answer3"> ${this.wrongChars[3]}</div>`];
 
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+
+                [array[currentIndex], array[randomIndex]] = [
+                    array[randomIndex], array[currentIndex]];
+            }
+
+            return array;
+        }
+
+        shuffle(arrOfElements)
+
         answerElement.innerHTML = `${arrOfElements[0]} 
-                                   ${arrOfElements[0]} 
-                                   ${arrOfElements[0]}  
-                                   ${arrOfElements[0]}`;
+                                   ${arrOfElements[1]} 
+                                   ${arrOfElements[2]}  
+                                   ${arrOfElements[3]}`;
 
     }
 
@@ -148,7 +164,6 @@ class App {
         answer.wrongAnswer();
         answer.render("div", ".root");
         // answer.render("div", ".wrongAnswerBox", true);
-
 
 
     }
