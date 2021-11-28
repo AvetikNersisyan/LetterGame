@@ -96,6 +96,59 @@
     display: none;
 }
 
+
+.answerBox {
+    width: 5vw;
+    height: 4vw;
+    border: 1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+
+}
+
+.boxContainer {
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: row;
+    width: 60vw;
+    height: 50px;
+    border: 0px solid black;
+    border-radius: 10px;
+    justify-content: space-between;
+    font-size: 2vw;
+
+}
+
+.correctAnswer {
+    width: 5vw;
+    height: 4vw;
+    border: 0px solid black;
+    background-color: #3ea63e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+}
+
+.wrongAnswer {
+    width: 5vw;
+    height: 4vw;
+    border: 1px solid black;
+    background-color: #dc2828;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+
+}
+
+.heading {
+    height: 10vh;
+    width: 100vw;
+}
+
 #pointInfo {
     font-size:large;
     padding: 1em;

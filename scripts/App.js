@@ -157,7 +157,9 @@ class Render {
 class App {
     sidebar = new SideBar();
     timer = new Timer(16);
-    popup = new Popup()
+    popup = new Popup();
+    answerBox = new AnswerBox();
+    answers = []
 
     render() {
 
@@ -170,11 +172,13 @@ class App {
         this.sidebar.render();
         this.sidebar.showPoints();
         this.isAnswerTrue();
-        this.timer.start()
+        this.timer.start();
+        this.answerBox.render(this.answers);
+
 
         // not ready yet...
-        if (this.sidebar.gameDetails.questionsCount >=10){
-        // this.popup.gameOver()
+        if (this.sidebar.gameDetails.questionsCount >= 10) {
+            // this.popup.gameOver()
 
         }
 
@@ -184,7 +188,8 @@ class App {
     isAnswerTrue() {
         document.querySelector(".AnswerBox").addEventListener("click", (event) => {
             this.isThereAnswer = true;
-            if (!this.timer.isTimeLeft){
+            if (!this.timer.isTimeLeft) {
+                this.answers.push(false)
                 return;
 
             }
@@ -193,27 +198,27 @@ class App {
 
             this.sidebar.gameDetails.questionsCount++;
             this.sidebar.showPoints();
-            this.timer.pause()
-
+            this.timer.pause();
 
 
             if (event.target.id === "answer0") {
                 event.target.className = "right-answer";
+                this.answers.push(true)
                 this.sidebar.pointCounter();
                 this.sidebar.showPoints();
-
 
 
             } else {
                 if (event.target.className !== "AnswerBox") {
                     event.target.className = "wrong-answer";
+                    this.answers.push(false)
 
                 }
 
             }
 
-            console.log(this.timer.isTimeLeft);
-            if (answerBoxElement.className !== "root"  ) {
+
+            if (answerBoxElement.className !== "root") {
                 answerBoxElement.classList.toggle("AnswerBox-invisible");
             }
 
@@ -224,15 +229,16 @@ class App {
     nextQuestion() {
         document.querySelector("button").addEventListener("click", (ev) => {
 
-
             Render.reset(".root");
+            this.answerBox.reset()
             this.render();
             this.timer.pause();
-            this.timer.start()
+            this.timer.start();
 
-            if (!this.isThereAnswer){
+            if (!this.isThereAnswer) {
                 this.sidebar.gameDetails.questionsCount++;
-                this.sidebar.showPoints()
+                this.sidebar.showPoints();
+                this.answers.push(undefined)
             }
             this.isThereAnswer = false;
         });
@@ -281,13 +287,13 @@ class Timer {
         if (!this.isRunning) {
             this.isTimeLeft = true;
             this.isRunning = true;
-            this.currTimer = this.initialVal
+            this.currTimer = this.initialVal;
             this.runTimer = setInterval(() => {
-                if (this.currTimer<=0){
+                if (this.currTimer <= 0) {
                     this.isTimeLeft = false;
-                    return
+                    return;
                 }
-                this.timer.innerHTML = this.currTimer<11? "Timer 00:0" + --this.currTimer: "Timer 00:" + --this.currTimer;
+                this.timer.innerHTML = this.currTimer < 11 ? "Timer 00:0" + --this.currTimer : "Timer 00:" + --this.currTimer;
 
             }, 1000);
         }
@@ -306,14 +312,46 @@ class Timer {
 // some functionalities to add ???
 class Popup {
 
-    gameOver(){
-      const overPopupElement =  new Render("div",".mainContainer").display();
-      overPopupElement.className = "over-popup";
+    gameOver() {
 
-      return overPopupElement;
+    }
+
+    showRules() {
+
     }
 }
 
+
+class AnswerBox {
+    boxItems = []
+
+    reset() {
+       this.boxContainer.parentElement.removeChild(this.boxContainer)
+    }
+
+    render(boxItems) {
+        this.boxItems = boxItems;
+
+        this.boxContainer = new Render("div", ".heading").display();
+        this.boxContainer.className = "boxContainer";
+        console.log(boxItems);
+
+        for (let i = 0; i < 10; i++) {
+            this.boxElement = document.createElement("div");
+            this.boxElement.innerHTML = `${i}`
+            if (this.boxItems[i] === undefined){
+                this.boxElement.classList.add("answerBox")
+            } else if (this.boxItems[i]){
+                this.boxElement.classList.add("correctAnswer")
+
+            } else {
+                this.boxElement.classList.add("wrongAnswer")
+            }
+
+            this.boxContainer.appendChild(this.boxElement);
+        }
+    }
+}
 
 class Run {
 
