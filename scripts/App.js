@@ -100,8 +100,8 @@ class Answer {
     }
 
 
-    render(tagName, selector) {
-        const answerElement = new Render(tagName, selector).display();
+    render(tagName, selector, className) {
+        const answerElement = new Render(tagName, selector, className).display();
 
         answerElement.setAttribute("class", "AnswerBox");
         const arrOfElements = [`<div id="answer1" class="options"> ${this.wrongChars[1]}</div>`,
@@ -134,9 +134,10 @@ class Answer {
 }
 
 class Render {
-    constructor(tagName, selector) {
+    constructor(tagName, selector, className) {
         this.tagName = tagName;
         this.selector = selector;
+        this.className = className;
     }
 
     static reset(selector) {
@@ -147,6 +148,7 @@ class Render {
     display() {
         const rootElement = document.querySelector(this.selector);
         const createdElement = document.createElement(this.tagName);
+        createdElement.className = this.className;
         rootElement.appendChild(createdElement);
         return createdElement;
 
@@ -159,7 +161,6 @@ class App {
     timer = new Timer(16);
     popup = new Popup();
     answerBox = new AnswerBox();
-    popup = new Popup();
     answers = [];
 
     render() {
@@ -175,6 +176,7 @@ class App {
         this.isAnswerTrue();
         this.timer.start();
         this.answerBox.render(this.answers);
+        this.popup.showRules();
 
         if (this.sidebar.gameDetails.questionsCount >= 10) {
             this.popup.gameOver(this.sidebar.gameDetails.points / this.sidebar.gameDetails.questionsCount, this.answerBox, this.answers);
@@ -231,11 +233,11 @@ class App {
     nextQuestion() {
         document.querySelector("button").addEventListener("click", (ev) => {
 
-
             Render.reset(".root");
             this.answerBox.reset();
             this.render();
-            // this.timer.pause();
+
+            this.timer.pause();
             this.sidebar.gameDetails.questionsCount >= 10 ? this.timer.pause() : this.timer.start();
 
             if (!this.isThereAnswer) {
@@ -315,29 +317,23 @@ class Timer {
 class Popup {
 
     gameOver(message) {
-        const popUpElement = new Render("div", ".root").display();
-        popUpElement.className = "game-over-container";
-
+        const popUpElement = new Render("div", ".root", "game-over-container").display();
         popUpElement.addEventListener("click", (ev) => {
             ev.target.className === "game-over-container" ? Run.restart() : "";
         });
-        const popupMessageElement = new Render("div", ".game-over-container").display();
-        popupMessageElement.className = "popup-message";
-        const messageElement = new Render("div", ".popup-message").display();
-        messageElement.className = "message";
-        messageElement.innerHTML = `<div id="game-over-text">
-        Game is over  <br>
-         You earned ${message.toFixed(1) * 100}% </div> `;
+
+        const popupMessageElement = new Render("div", ".game-over-container", "popup-message").display();
+        const messageElement = new Render("div", ".popup-message", "message").display();
+
+        messageElement.innerHTML = `<div id="game-over-text"> Game is over  <br>
+                                    You earned ${message.toFixed(1) * 100}% </div> `;
+
         const copiedProgressBar = document.querySelector(".boxContainer").cloneNode(true);
         copiedProgressBar.style.width = "100%";
         messageElement.appendChild(copiedProgressBar);
 
-        const btnContainerElement = new Render("div", ".popup-message").display();
-        btnContainerElement.className = "btnContainer";
-
-
-        const newGameBtn = new Render("input", ".btnContainer").display();
-        newGameBtn.className = "newGameBtn";
+        const btnContainerElement = new Render("div", ".popup-message", "btnContainer").display();
+        const newGameBtn = new Render("input", ".btnContainer", "newGameBtn").display();
 
         newGameBtn.setAttribute("type", "button");
         newGameBtn.setAttribute("value", "New game");
@@ -350,6 +346,16 @@ class Popup {
     }
 
     showRules() {
+        const rulesBtn = new Render("div", ".root", "rulesBtn").display();
+        rulesBtn.innerHTML = "Show rules";
+rulesBtn.addEventListener("mouseenter", ()=> {
+    // alert("hello")
+})
+        const popupRules = new Render("div", ".rulesBtn", "rulesMessage").display();
+        popupRules.innerHTML =
+            "A simple game, where player should find the correct letter in the English Alphabet according to given initial letter and number. " +
+
+            "For Example, it is given \"A\" + 3. You should find 3rd letter to right from \"A\". And it is \"D\".   "
 
     }
 }
