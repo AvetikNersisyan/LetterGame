@@ -159,7 +159,8 @@ class App {
     timer = new Timer(16);
     popup = new Popup();
     answerBox = new AnswerBox();
-    answers = []
+    popup = new Popup();
+    answers = [];
 
     render() {
 
@@ -175,11 +176,8 @@ class App {
         this.timer.start();
         this.answerBox.render(this.answers);
 
-
-        // not ready yet...
         if (this.sidebar.gameDetails.questionsCount >= 10) {
-            // this.popup.gameOver()
-
+            this.popup.gameOver(this.sidebar.gameDetails.points / this.sidebar.gameDetails.questionsCount, this.answerBox, this.answers);
         }
 
 
@@ -189,13 +187,12 @@ class App {
         document.querySelector(".AnswerBox").addEventListener("click", (event) => {
             this.isThereAnswer = true;
             if (!this.timer.isTimeLeft) {
-                this.answers.push(false)
+                this.answers.push(false);
                 return;
-
             }
 
-            const answerBoxElement = event.target.parentElement;
 
+            const answerBoxElement = event.target.parentElement;
             this.sidebar.gameDetails.questionsCount++;
             this.sidebar.showPoints();
             this.timer.pause();
@@ -203,7 +200,7 @@ class App {
 
             if (event.target.id === "answer0") {
                 event.target.className = "right-answer";
-                this.answers.push(true)
+                this.answers.push(true);
                 this.sidebar.pointCounter();
                 this.sidebar.showPoints();
 
@@ -211,7 +208,8 @@ class App {
             } else {
                 if (event.target.className !== "AnswerBox") {
                     event.target.className = "wrong-answer";
-                    this.answers.push(false)
+                    document.querySelector("#answer0").className = "right-answer";
+                    this.answers.push(false);
 
                 }
 
@@ -222,6 +220,10 @@ class App {
                 answerBoxElement.classList.toggle("AnswerBox-invisible");
             }
 
+            this.answerBox.reset();
+            this.answerBox.render(this.answers);
+
+
         });
     }
 
@@ -229,16 +231,17 @@ class App {
     nextQuestion() {
         document.querySelector("button").addEventListener("click", (ev) => {
 
+
             Render.reset(".root");
-            this.answerBox.reset()
+            this.answerBox.reset();
             this.render();
-            this.timer.pause();
-            this.timer.start();
+            // this.timer.pause();
+            this.sidebar.gameDetails.questionsCount >= 10 ? this.timer.pause() : this.timer.start();
 
             if (!this.isThereAnswer) {
                 this.sidebar.gameDetails.questionsCount++;
                 this.sidebar.showPoints();
-                this.answers.push(undefined)
+                this.answers.push(undefined);
             }
             this.isThereAnswer = false;
         });
@@ -279,7 +282,7 @@ class Timer {
         this.initialVal = maxTime;
         this.isRunning = false;
         this.currTimer = maxTime;
-        this.runTimer;
+
         this.timer = document.getElementById('timer');
     }
 
@@ -309,10 +312,40 @@ class Timer {
 }
 
 
-// some functionalities to add ???
 class Popup {
 
-    gameOver() {
+    gameOver(message) {
+        const popUpElement = new Render("div", ".root").display();
+        popUpElement.className = "game-over-container";
+
+        popUpElement.addEventListener("click", (ev) => {
+            ev.target.className === "game-over-container" ? Run.restart() : "";
+        });
+        const popupMessageElement = new Render("div", ".game-over-container").display();
+        popupMessageElement.className = "popup-message";
+        const messageElement = new Render("div", ".popup-message").display();
+        messageElement.className = "message";
+        messageElement.innerHTML = `<div id="game-over-text">
+        Game is over  <br>
+         You earned ${message.toFixed(1) * 100}% </div> `;
+        const copiedProgressBar = document.querySelector(".boxContainer").cloneNode(true);
+        copiedProgressBar.style.width = "100%";
+        messageElement.appendChild(copiedProgressBar);
+
+        const btnContainerElement = new Render("div", ".popup-message").display();
+        btnContainerElement.className = "btnContainer";
+
+
+        const newGameBtn = new Render("input", ".btnContainer").display();
+        newGameBtn.className = "newGameBtn";
+
+        newGameBtn.setAttribute("type", "button");
+        newGameBtn.setAttribute("value", "New game");
+
+        newGameBtn.addEventListener("click", () => {
+            Run.restart();
+        });
+
 
     }
 
@@ -323,10 +356,10 @@ class Popup {
 
 
 class AnswerBox {
-    boxItems = []
+    boxItems = [];
 
     reset() {
-       this.boxContainer.parentElement.removeChild(this.boxContainer)
+        this.boxContainer.parentElement.removeChild(this.boxContainer);
     }
 
     render(boxItems) {
@@ -334,18 +367,18 @@ class AnswerBox {
 
         this.boxContainer = new Render("div", ".heading").display();
         this.boxContainer.className = "boxContainer";
-        console.log(boxItems);
+
 
         for (let i = 0; i < 10; i++) {
             this.boxElement = document.createElement("div");
-            this.boxElement.innerHTML = `${i}`
-            if (this.boxItems[i] === undefined){
-                this.boxElement.classList.add("answerBox")
-            } else if (this.boxItems[i]){
-                this.boxElement.classList.add("correctAnswer")
+            this.boxElement.innerHTML = `${i + 1}`;
+            if (this.boxItems[i] === undefined) {
+                this.boxElement.classList.add("answerBox");
+            } else if (this.boxItems[i]) {
+                this.boxElement.classList.add("correctAnswer");
 
             } else {
-                this.boxElement.classList.add("wrongAnswer")
+                this.boxElement.classList.add("wrongAnswer");
             }
 
             this.boxContainer.appendChild(this.boxElement);
@@ -356,14 +389,18 @@ class AnswerBox {
 class Run {
 
     static letterGame() {
-        const app = new App();
-        app.render();
-        app.nextQuestion();
+        this.app = new App();
+        this.app.render();
+        this.app.nextQuestion();
+    }
+
+    static restart() {
+        location.reload();
     }
 }
 
-Run.letterGame();
 
+Run.letterGame();
 
 
 

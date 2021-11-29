@@ -4,6 +4,12 @@
 
 }
 
+.root {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .mainContainer {
     width: 60vw;
     height: 60vh;
@@ -15,26 +21,37 @@
 }
 
 #question {
-    height: 100px;
+    border: 1px solid black;
+    height: 50px;
     width: 100%;
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
     justify-content: center;
     align-items: center;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    background-color: rgba(255, 228, 196, 0.66);
+}
+
+#game-over-text {
+    text-align: center;
 }
 
 .AnswerBox {
     display: grid;
-    grid-template-columns: 50% 50%;
+    grid-template-columns: 40% 40%;
     justify-items: center;
-    grid-gap: 2em;
+    justify-content: center;
+    grid-gap: 1em;
     grid-row-gap: 1em;
+    width: 70%;
 }
 
 .options {
-    height: 8vw;
-    width: 100%;
+    height: 3vw;
+    width: 70%;
     padding: 0.5em;
     border: black solid 1px;
     display: flex;
@@ -47,15 +64,14 @@
 }
 
 
-
 .options:hover {
     cursor: pointer;
     background-color: burlywood;
 }
 
 .right-answer {
-    height: 8vw;
-    width: 100%;
+    height: 3.5vw;
+    width: 70%;
     padding: 0.5em;
     border: black solid 1px;
     display: flex;
@@ -63,11 +79,13 @@
     align-items: center;
     background-color: #3ea63e;
     border-radius: 15px;
+    transition: 1000ms;
+    animation: blinker 100ms linear 2;
 }
 
 .wrong-answer {
-    height: 8vw;
-    width: 100%;
+    height: 3.5vw;
+    width: 70%;
     padding: 0.5em;
     border: black solid 1px;
     display: flex;
@@ -75,6 +93,8 @@
     align-items: center;
     background-color: #dc2828;
     border-radius: 15px;
+    transition: 500ms;
+
 }
 
 .AnswerBox-invisible {
@@ -90,9 +110,10 @@
     top: 10vh;
     left: 20vw;
     z-index: 100;
+
 }
 
-.over-popup-invisible{
+.over-popup-invisible {
     display: none;
 }
 
@@ -109,11 +130,11 @@
 }
 
 .boxContainer {
-    margin-top: 2vh;
+
     display: flex;
     flex-direction: row;
     width: 60vw;
-    height: 50px;
+    height: 4vw;
     border: 0px solid black;
     border-radius: 10px;
     justify-content: space-between;
@@ -130,6 +151,7 @@
     justify-content: center;
     align-items: center;
     border-radius: 10px;
+
 }
 
 .wrongAnswer {
@@ -145,35 +167,104 @@
 }
 
 .heading {
-    height: 10vh;
+    height: 4vw;
     width: 100vw;
+    margin-top: 0.5em;
+}
+
+.game-over-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 100%;
+    height: 130vh;
+    background-color: rgba(59, 58, 58, 0.69);
+}
+
+.popup-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: -50vh;
+    justify-content: center;
+    height: auto;
+    width: 60%;
+    border: 2px solid black;
+    background-color: #bdbdbd;
+    border-radius: 15px;
+    transition: 5000ms linear;
+
+    /*transform: translate(500);*/
+
+}
+
+.message {
+    /*border: 1px solid black;*/
+    width: 90%;
+    height: 50%;
+    font-size: 4vw;
+}
+
+.btnContainer {
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    margin-top: 1em;
+    width: 90%;
+    justify-content: center;
+    margin-bottom: 0.5em;
+}
+
+.btnContainer > input {
+    width: 23vw;
+    height: 5vw;
+    border-radius: 5px;
+    font-size: 4vw;
+}
+
+.btnContainer > input:hover {
+    background-color: antiquewhite;
+    cursor: pointer;
 }
 
 #pointInfo {
-    font-size:large;
+    font-size: large;
     padding: 1em;
 }
 
 #nextQuestionBtn {
     margin-left: 50vw;
-    width: 30vw;
-    font-size: 0.5em;
+    width: 15vw;
+    height: 5vw;
+    font-size: 1.5vw;
     padding: 0.3em;
     border-radius: 5px;
+    background-color: rgba(162, 159, 159, 0.49);
 }
 
 #nextQuestionBtn:hover {
-    background-color: burlywood;
+    background-color: rgba(162, 159, 159, 0.93);
     color: black;
     cursor: pointer;
 }
 
 #timer {
     border: solid black 2px;
-    height: 1.3em;
+    height: 0.9em;
     width: 6em;
     padding: 0.3em;
     border-radius: 8px;
     background-color: rgba(162, 159, 159, 0.49);
+    font-size: 2vw;
 }
 
+
+@keyframes blinker {
+    100% {
+        opacity: 0;
+    }
+}
