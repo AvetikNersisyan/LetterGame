@@ -1,11 +1,19 @@
+/**
+ * fetches random letter,  number and operator ( + or - ) to construct the question.
+ */
 class Question {
-    letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+
+    englishLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
     max;
     operand;
     number;
     questionText;
     randomChar;
 
+    constructor(letters) {
+        this.letters = letters || this.englishLetters;
+    }
 
     randomLetter() {
         const randIndex = Math.floor(Math.random() * (this.letters.length - 1));
@@ -19,6 +27,7 @@ class Question {
 
 
     askQuestion() {
+
         this.operand = Math.random() > 0.5 ? " + " : " - ";
         this.questionText = "";
         this.randomChar = this.randomLetter();
@@ -59,12 +68,14 @@ class Question {
 
 }
 
+/**
+ * some logic to suggest 1 correct and 3 incorrect options.
+ */
 class Answer {
     rightChar;
     wrongChars = [];
 
     constructor(isCorrect = false, char, num, operand, letters) {
-        this.isCorrect = isCorrect;
         this.char = char;
         this.num = num;
         this.operand = operand;
@@ -100,6 +111,12 @@ class Answer {
     }
 
 
+    /**
+     * renders options to question.
+     * @param tagName
+     * @param selector
+     * @param className
+     */
     render(tagName, selector, className) {
         const answerElement = new Render(tagName, selector, className).display();
 
@@ -133,6 +150,12 @@ class Answer {
     }
 }
 
+/**
+ * this class constructor expects a tag, a selector and a className.
+ * display() method creates DOM element according to given  HTML tag, adds to that element a className.
+ * After all appends to given selector.
+ *
+ */
 class Render {
     constructor(tagName, selector, className) {
         this.tagName = tagName;
@@ -140,11 +163,19 @@ class Render {
         this.className = className;
     }
 
+    /**
+     * sets inner HTML of the given DOM Element to empty string.
+     * @param selector
+     */
     static reset(selector) {
         const element = document.querySelector(selector);
         element.innerHTML = "";
     }
 
+    /**
+     * creates HTML elements according to given arguments.
+     * @returns {HTMLElement} HTML Element
+     */
     display() {
         const rootElement = document.querySelector(this.selector);
         const createdElement = document.createElement(this.tagName);
@@ -155,17 +186,32 @@ class Render {
     }
 }
 
-
+/**
+ * the main class which renders answers, options, question, timer etc.
+ */
 class App {
+
+    maxTime;
+    letters;
     sidebar = new SideBar();
-    timer = new Timer(16);
-    popup = new Popup();
-    answerBox = new AnswerBox();
+    answerBoxCount;
     answers = [];
+    targets = [];
 
+    constructor(letters, maxTime, answerBoxCount) {
+        this.answerBoxCount = answerBoxCount;
+        this.answerBox = new AnswerBox(this.answers,this.answerBoxCount );
+        this.letters = letters;
+        this.maxTime = maxTime;
+        this.timer = new Timer(this.maxTime);
+    }
+
+    /**
+     * renders all DOM elements.
+     */
     render() {
-
-        this.question = new Question();
+        this.popup = new Popup(this.letters);
+        this.question = new Question(this.letters);
         this.question.render();
         this.answer = new Answer(false, this.question.randomChar, this.question.number, this.question.operand, this.question.letters);
         this.answer.rightAnswer();
@@ -175,16 +221,17 @@ class App {
         this.sidebar.showPoints();
         this.isAnswerTrue();
         this.timer.start();
-        this.answerBox.render(this.answers);
+        this.answerBox.render();
         this.popup.showRules();
 
-        if (this.sidebar.gameDetails.questionsCount >= 10) {
+        if (this.sidebar.gameDetails.questionsCount >= this.answerBoxCount) {
             this.popup.gameOver(this.sidebar.gameDetails.points / this.sidebar.gameDetails.questionsCount, this.answerBox, this.answers);
         }
-
-
     }
 
+    /**
+     * some logic to check if answer true or false and according to that sets some styles.
+     */
     isAnswerTrue() {
         document.querySelector(".AnswerBox").addEventListener("click", (event) => {
             this.isThereAnswer = true;
@@ -195,7 +242,6 @@ class App {
 
 
             const answerBoxElement = event.target.parentElement;
-            this.sidebar.gameDetails.questionsCount++;
             this.sidebar.showPoints();
             this.timer.pause();
 
@@ -226,31 +272,58 @@ class App {
             this.answerBox.render(this.answers);
 
 
+            if (this.targets[this.sidebar.gameDetails.questionsCount]) {
+                this.nextQuestionHandler(2000);
+            }
+
+
         });
+    }
+
+    delay(delayInMs) {
+        return new Promise(resolve => {
+            setTimeout(() => {
+                resolve(2);
+            }, delayInMs);
+        });
+    }
+
+    async nextQuestionHandler(milliSeconds) {
+        this.sidebar.gameDetails.questionsCount++;
+
+        // let btn = document.querySelector("button");
+        //
+        // btn.addEventListener("click", () => {
+        //
+        // });
+
+        await this.delay(milliSeconds);
+
+        Render.reset(".root");
+        this.answerBox.reset();
+        this.render();
+
+        this.timer.pause();
+        this.sidebar.gameDetails.questionsCount >= this.answerBoxCount ? this.timer.pause() : this.timer.start();
+
+
+        if (!this.isThereAnswer) {
+            this.sidebar.showPoints();
+            this.answers.push(undefined);
+        }
+        this.isThereAnswer = false;
+
     }
 
 
     nextQuestion() {
-        document.querySelector("button").addEventListener("click", (ev) => {
-
-            Render.reset(".root");
-            this.answerBox.reset();
-            this.render();
-
-            this.timer.pause();
-            this.sidebar.gameDetails.questionsCount >= 10 ? this.timer.pause() : this.timer.start();
-
-            if (!this.isThereAnswer) {
-                this.sidebar.gameDetails.questionsCount++;
-                this.sidebar.showPoints();
-                this.answers.push(undefined);
-            }
-            this.isThereAnswer = false;
-        });
+        document.querySelector("button").addEventListener("click", this.nextQuestionHandler.bind(this));
     }
 }
 
-
+/**
+ * calculate and render correct answers out of all questions.
+ */
 class SideBar {
 
     gameDetails = {
@@ -258,7 +331,10 @@ class SideBar {
         questionsCount: 0
     };
 
-
+    /**
+     * increases points
+     * @returns {number} points
+     */
     pointCounter() {
         return ++(this.gameDetails.points);
     }
@@ -278,8 +354,12 @@ class SideBar {
 }
 
 
+/**
+ * creates timer, if not given parameter, by default it is 16 seconds.
+ */
 class Timer {
-    constructor(maxTime = 15) {
+    constructor(maxTime = 16) {
+
         this.isTimeLeft = true;
         this.initialVal = maxTime;
         this.isRunning = false;
@@ -314,25 +394,37 @@ class Timer {
 }
 
 
+/**
+ * show some popup boxes. For example, game over, or rules
+ */
 class Popup {
 
+    constructor(letters) {
+        this.letters = letters;
+
+    }
+
+    /**
+     *  shows game Over popup box
+     * @param message number which is fraction of correct answers.
+     */
     gameOver(message) {
         const popUpElement = new Render("div", ".root", "game-over-container").display();
         popUpElement.addEventListener("click", (ev) => {
             ev.target.className === "game-over-container" ? Run.restart() : "";
         });
 
-        const popupMessageElement = new Render("div", ".game-over-container", "popup-message").display();
+        new Render("div", ".game-over-container", "popup-message").display();
         const messageElement = new Render("div", ".popup-message", "message").display();
 
         messageElement.innerHTML = `<div id="game-over-text"> Game is over  <br>
                                     You earned ${message.toFixed(1) * 100}% </div> `;
 
         const copiedProgressBar = document.querySelector(".boxContainer").cloneNode(true);
-        copiedProgressBar.style.width = "100%";
+       copiedProgressBar.className = ("popupBoxContainer")
         messageElement.appendChild(copiedProgressBar);
 
-        const btnContainerElement = new Render("div", ".popup-message", "btnContainer").display();
+        new Render("div", ".popup-message", "btnContainer").display();
         const newGameBtn = new Render("input", ".btnContainer", "newGameBtn").display();
 
         newGameBtn.setAttribute("type", "button");
@@ -345,37 +437,55 @@ class Popup {
 
     }
 
+    /**
+     * popups rule box on mouse enter
+     */
     showRules() {
         const rulesBtn = new Render("div", ".root", "rulesBtn").display();
         rulesBtn.innerHTML = "Show rules";
-rulesBtn.addEventListener("mouseenter", ()=> {
-    // alert("hello")
-})
+        rulesBtn.addEventListener("mouseenter", () => {
+            // alert("hello")
+        });
         const popupRules = new Render("div", ".rulesBtn", "rulesMessage").display();
-        popupRules.innerHTML =
-            "A simple game, where player should find the correct letter in the English Alphabet according to given initial letter and number. " +
+        popupRules.innerHTML = `A simple game, where player should find the correct letter in the Alphabet according to given initial letter and number. 
 
-            "For Example, it is given \"A\" + 3. You should find 3rd letter to right from \"A\". And it is \"D\".   "
+            For Example, it is given  ${this.letters[0]}  + 3. You should find 3rd letter to right from  ${this.letters[0]} . And it is ${this.letters[3]} .`;
 
     }
 }
 
-
+/**
+ * Class to create answers box, which contains true, false and missed boxes. (above 10 boxes by default)
+ */
 class AnswerBox {
     boxItems = [];
+    boxCount;
 
+    constructor(boxItems, boxCount = 10) {
+        this.boxItems = boxItems;
+        this.boxCount = boxCount;
+    }
+
+    /**
+     * resets the answer box
+     */
     reset() {
         this.boxContainer.parentElement.removeChild(this.boxContainer);
     }
 
-    render(boxItems) {
-        this.boxItems = boxItems;
+
+    /**
+     * @param boxItems is the answers received from user.
+     * creates answer box (above 10 boxes) and styles it according to given answer.
+     *
+     */
+    render() {
 
         this.boxContainer = new Render("div", ".heading").display();
         this.boxContainer.className = "boxContainer";
 
 
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < this.boxCount; i++) {
             this.boxElement = document.createElement("div");
             this.boxElement.innerHTML = `${i + 1}`;
             if (this.boxItems[i] === undefined) {
@@ -392,21 +502,46 @@ class AnswerBox {
     }
 }
 
+/**
+ * The instance of this class runs the app using letterGame() method
+ * You can pass any language alphabet, and max time for timer.
+ * Alphabet should pass as an array
+ */
 class Run {
+    letters;
+    maxTime;
 
-    static letterGame() {
-        this.app = new App();
-        this.app.render();
-        this.app.nextQuestion();
+
+    constructor(letters, maxTime, answerBoxCount) {
+        this.letters = letters;
+        this.maxTime = maxTime;
+        this.answerBoxCount = answerBoxCount;
     }
 
+    /**
+     * Static method, refreshes browser page to restart the app;
+     */
     static restart() {
         location.reload();
+    }
+
+    /**
+     * Runs the app
+     */
+    letterGame() {
+        this.app = new App(this.letters, this.maxTime, this.answerBoxCount);
+        this.app.render();
+        this.app.nextQuestion();
     }
 }
 
 
-Run.letterGame();
+const armenianLetters = ["Ա", "Բ", "Գ", "Դ", "Ե", "Զ", "Է", "Ը", "Թ", "Ժ", "Ի", "Լ", "Խ", "Ծ", "Կ", "Հ", "Ձ", "Ղ", "Ճ", "Մ", "Յ", "Ն", "Շ", "Ո", "Չ", "Պ", "Ջ", "Ռ", "Ս", "Վ", "Տ", "Ր", "Ց", "Ու", "Փ", "Ք", "ԵՎ", "Օ", "Ֆ"];
+const englishLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+
+const letterGame = new Run(armenianLetters, 26,50 );
+
+letterGame.letterGame();
 
 
 
