@@ -200,7 +200,7 @@ class App {
 
     constructor(letters, maxTime, answerBoxCount) {
         this.answerBoxCount = answerBoxCount;
-        this.answerBox = new AnswerBox(this.answers,this.answerBoxCount );
+        this.answerBox = new AnswerBox(this.answers, this.answerBoxCount);
         this.letters = letters;
         this.maxTime = maxTime;
         this.timer = new Timer(this.maxTime);
@@ -272,32 +272,15 @@ class App {
             this.answerBox.render(this.answers);
 
 
-            if (this.targets[this.sidebar.gameDetails.questionsCount]) {
-                this.nextQuestionHandler(2000);
-            }
-
+            // this.nextQuestionHandler(2000);
 
         });
     }
 
-    delay(delayInMs) {
-        return new Promise(resolve => {
-            setTimeout(() => {
-                resolve(2);
-            }, delayInMs);
-        });
-    }
 
-    async nextQuestionHandler(milliSeconds) {
+    nextQuestionHandler(milliSeconds) {
         this.sidebar.gameDetails.questionsCount++;
 
-        // let btn = document.querySelector("button");
-        //
-        // btn.addEventListener("click", () => {
-        //
-        // });
-
-        await this.delay(milliSeconds);
 
         Render.reset(".root");
         this.answerBox.reset();
@@ -421,7 +404,7 @@ class Popup {
                                     You earned ${message.toFixed(1) * 100}% </div> `;
 
         const copiedProgressBar = document.querySelector(".boxContainer").cloneNode(true);
-       copiedProgressBar.className = ("popupBoxContainer")
+        copiedProgressBar.className = ("popupBoxContainer");
         messageElement.appendChild(copiedProgressBar);
 
         new Render("div", ".popup-message", "btnContainer").display();
@@ -539,7 +522,7 @@ class Run {
 const armenianLetters = ["Ա", "Բ", "Գ", "Դ", "Ե", "Զ", "Է", "Ը", "Թ", "Ժ", "Ի", "Լ", "Խ", "Ծ", "Կ", "Հ", "Ձ", "Ղ", "Ճ", "Մ", "Յ", "Ն", "Շ", "Ո", "Չ", "Պ", "Ջ", "Ռ", "Ս", "Վ", "Տ", "Ր", "Ց", "Ու", "Փ", "Ք", "ԵՎ", "Օ", "Ֆ"];
 const englishLetters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
-const letterGame = new Run(armenianLetters, 26,50 );
+const letterGame = new Run(englishLetters, 11, 15);
 
 letterGame.letterGame();
 

@@ -7,7 +7,8 @@
 }
 
 body {
- background-color: rgb(247 230 218)
+ background-color: rgb(247 230 218);
+    background-image: url("../img/neuro9.jpg");
 }
 
 .root {
